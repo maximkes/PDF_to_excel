@@ -17,7 +17,14 @@
 mono_crash.*
 
 # Build results
-[Dd]ebug/
+[Dd]ebug/BouncyCastle.Crypto.dll
+[Dd]ebug/ChooseFile.deps
+[Dd]ebug/ChooseFile.dll
+[Dd]ebug/ChooseFile.pdb
+[Dd]ebug/ChooseFile.runtimeconfig
+[Dd]ebug/itextsharp.dll
+[Dd]ebug/itextsharp.xmlworker.dll
+[Dd]ebug/Microsoft.Office.Interop.Excel.dll
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
