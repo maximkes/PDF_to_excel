@@ -40,6 +40,7 @@ namespace ChooseFile
 
         private void SaveToExcel(List<string> Text, string path, string name)
         {
+            name = GenerateName(path, name);
             var newXLFile = WorkBook.Create(ExcelFileFormat.XLSX);
             newXLFile.Metadata.Title = "IronXL New File";
             var newWorkSheet = newXLFile.CreateWorkSheet("1stWorkSheet");
@@ -100,6 +101,25 @@ namespace ChooseFile
             
             SaveToExcel(TextList, GetFilePath(filePath), GetFileName(filePath));
             button1.Enabled = true;
+        }
+
+        private string GenerateName(string path, string name)
+        {
+            string res="";
+            var directory = new DirectoryInfo(path);
+            FileInfo[] files = directory.GetFiles();
+            List<string> FileNames = new List<string>();
+            foreach (FileInfo file in files)
+            {
+                FileNames.Add(file.Name);
+            }
+            if (!FileNames.Contains(name + ".xlsx")) 
+                return name;
+            int n = 1;
+            while (FileNames.Contains(name + "(" + n.ToString() + ").xlsx")) 
+                n++;
+            //string s = name + "(" + n.ToString() + ").xlsx";
+            return (name + "(" + n.ToString() + ")");
         }
     }
 }
