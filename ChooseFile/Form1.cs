@@ -3,10 +3,10 @@ using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
 using System;
 using System.Text;
-using Excel = Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
-//using System.IO;
+using IronXL;
+
 
 namespace ChooseFile
 {
@@ -18,6 +18,59 @@ namespace ChooseFile
         }
 
         private void Form1_Load(object sender, EventArgs e)
+        {
+            
+        }
+
+        private List<string> GetText(string path)
+        {
+            var res = new List<string>();
+            using (PdfReader reader = new PdfReader(path))
+            {
+                StringBuilder text = new StringBuilder();
+
+                for (int i = 1; i <= reader.NumberOfPages; i++)
+                {
+                    res.Add(PdfTextExtractor.GetTextFromPage(reader, i));
+                }
+
+                return res;
+            }
+        }
+
+        private void SaveToExcel(List<string> Text, string path, string name)
+        {
+            var newXLFile = WorkBook.Create(ExcelFileFormat.XLSX);
+            newXLFile.Metadata.Title = "IronXL New File";
+            var newWorkSheet = newXLFile.CreateWorkSheet("1stWorkSheet");
+            //newWorkSheet["A1"].Value = "Hello World";
+            int N=Text.Count;
+            for(int i =0; i< Text.Count; i++)
+            {
+                newWorkSheet[("A"+(i+1).ToString())].Value = Text[i];
+                textBox1.Text = ((i+1).ToString() + "/" + N.ToString() + ": " + Text[i]);
+            }
+            textBox1.Text = "‘айл " + name + ".xlsx" + " успешно создан";
+            string new_path = path + "\\" + name + ".xlsx";
+            newXLFile.SaveAs(new_path);
+
+            
+        }
+
+        private string GetFileName(string path)
+        {
+            string res = "";
+            res = path.Split('\\')[path.Split('\\').Length-1];
+            res = res.Replace(".pdf", "");
+            return res;
+        }
+        
+        private string GetFilePath(string path)
+        {
+            return path.Substring(0, path.LastIndexOf('\\'));
+        }
+
+        private void button1_Click(object sender, EventArgs e)
         {
             var fileContent = string.Empty;
             var filePath = string.Empty;
@@ -42,60 +95,11 @@ namespace ChooseFile
                     }
                 }
             }
+            button1.Enabled = false;
             var TextList = GetText(filePath);
-            for(int i=0; i<TextList.Count; i++)
-            {
-                TextList[i] = TextList[i].Replace("\n", "");
-                listBox1.Items.Insert(i,TextList[i]);
-
-            }
-            textBox1.Text = TextList[0];
             
-            //MessageBox.Show(TextList.ToString(), "File Content at path: " + filePath, MessageBoxButtons.OK);
-
-            //SaveToExcel(TextList, filePath);
-        }
-
-        private List<string> GetText(string path)
-        {
-            var res = new List<string>();
-            using (PdfReader reader = new PdfReader(path))
-            {
-                StringBuilder text = new StringBuilder();
-
-                for (int i = 1; i <= reader.NumberOfPages; i++)
-                {
-                    res.Add(PdfTextExtractor.GetTextFromPage(reader, i));
-                }
-
-                return res;
-            }
-        }
-
-        private void SaveToExcel(List<string> Text, string path)
-        {
-            Excel.Application excelApp = new Excel.Application();
-
-            // —делать приложение Excel видимым
-            excelApp.Visible = true;
-            excelApp.Workbooks.Add();
-            Excel._Worksheet workSheet = (Excel._Worksheet)excelApp.ActiveSheet;
-            // ”становить заголовки столбцов в €чейках
-            for(int i=0;i<Text.Count;i++)
-            {
-                workSheet.Cells[i, "A"] = Text[i];
-            }
-            
-            excelApp.DisplayAlerts = false;
-            workSheet.SaveAs(path.Replace(".pdf", ".xlsx"));
-
-            excelApp.Quit();
-
-        }
-
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
+            SaveToExcel(TextList, GetFilePath(filePath), GetFileName(filePath));
+            button1.Enabled = true;
         }
     }
 }
