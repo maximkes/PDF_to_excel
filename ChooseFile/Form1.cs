@@ -98,7 +98,14 @@ namespace ChooseFile
             }
             button1.Enabled = false;
             var TextList = GetText(filePath);
-            
+            for(int i=0; i<TextList.Count; i++)
+            {
+                string L = "";
+                foreach(var x in TextList[i].Split("\n"))
+                    L = L + x;
+                TextList[i] = L;
+                int a = (TextList[i]).Length;
+            }
             SaveToExcel(TextList, GetFilePath(filePath), GetFileName(filePath));
             button1.Enabled = true;
         }
